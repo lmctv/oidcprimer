@@ -2,6 +2,6 @@
     "application_type": "web",
     "redirect_uris": ["http://localhost:8090/code_flow_callback", "http://localhost:8090/implicit_flow_callback"],
     "response_types": ["code", "token id_token"],
-    "client_id": null,
-    "client_secret": null
+    "client_id": "e594fde5-7de7-42d3-8526-f9ece84f90c3",
+    "client_secret": "AMSNLKJRB4v5YGUy9PsYS0cVZ34s70PYqM3kB5eX_2eAGqxP6s6q76t-ll-h1sWZpIESTLOFTnzGmjFQtRBaP8M"
 }

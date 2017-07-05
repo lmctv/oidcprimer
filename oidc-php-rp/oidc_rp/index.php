@@ -42,6 +42,7 @@ $app['oidc'] = function () use ($app) {
 
     $client_id = $client_config['client_id'];
     $client_secret = $client_config['client_secret'];
+    $client_name = 'php-client-test';
 
     if ($client_id and $client_secret) {
         $app['session']-> set('oidcclient', array(
@@ -51,10 +52,16 @@ $app['oidc'] = function () use ($app) {
     }
     
     if (null === $oidcclient = $app['session']->get('oidcclient')) {
-        // TODO register with the provider using the client_metadata
-        $app['session']-> set('oidcclient', array(
-            'client_id' => $oidc->getClientID(),
-            'client_secret' => $oidc->getClientSecret()
+	    $oidc = new OpenIDConnectClient('https://mitreid.org/', null, null);
+	    $oidc->redirectURL = $client_config['redirect_uris'][0];
+	    $oidc->setResponseTypes([$client_config['response_types'][0]]);
+	    $oidc->setClientName($client_name);
+
+	    $oidc->register(); 
+
+	    $app['session']-> set('oidcclient', array(
+	    		'client_id' => $oidc->getClientID(),
+		    'client_secret' => $oidc->getClientSecret()
         ));
     }
     else {
@@ -72,30 +79,36 @@ $app['oidc'] = function () use ($app) {
 $app->get('/', function () use ($app) {
     $app['session']->clear();
     return $app['twig']->render('index.html');
-    });
+});
 
 $app->get('/authenticate', function () use ($app) {
     $oidc = $app['oidc'];
     if ($oidc) {
-        // TODO make authentication request
+	$oidc->addScope("openid");
+	$oidc->addScope("profile");
+	$oidc->addScope("email");
+	$oidc->authenticate();
     }
     $app->abort('500', 'Something went wrong with oidc, check console/web-container logs.');
   });
-
+  
 $app->get('/code_flow_callback', function () use ($app) {
     $oidc = $app['oidc'];
     if ($oidc) {
-        // TODO parse the authentication response
+	$code = $_GET['code'];
+	$state = $_GET['state'];
 
-        // TODO make userinfo request
+	assert ($state == $app['session']);
 
-        // TODO set the appropriate values
-        $client_id = null;
-        $client_secret = null;
-        $auth_code = null;
-        $access_token = null;
-        $id_token = null;
-        $userinfo = null;
+	$oidc->authenticate();
+
+	$userinfo = $oidc->requestUserInfo();
+
+        $client_id = $oidc->getClientID();
+        $client_secret = $oidc->getClientSecret();
+        $auth_code =  $code;
+        $access_token =  $oidc->getAccessToken();
+	$id_token =  $oidc->getIdToken();
 
         return $app['twig']->render('success_page.html',array(
             'client_id' => $client_id,
@@ -103,7 +116,7 @@ $app->get('/code_flow_callback', function () use ($app) {
             'auth_code' => $auth_code,
             'access_token' => $access_token,
             'id_token_claims' => $id_token,
-            'userinfo' => $userinfo,
+            'userinfo' => json_encode($userinfo, JSON_PRETTY_PRINT),
         ));
     }
     $app->abort('500', 'Something went wrong with oidc, check console/web-container logs.');
