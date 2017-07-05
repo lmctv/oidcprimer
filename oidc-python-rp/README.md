@@ -27,9 +27,7 @@ On Ubuntu:
 1. Install the dependencies: ``pip install -r requirements.txt``
 
 1. Test that the project runs:
-  1. Specify the path to the root directory containing all necessary files (``client.json``, 
-     ``index.html``, etc.) in ``Client.ROOT_PATH`` (in ``oidc_rp/client.py``).
-  1. Run the Relying Party (RP): ``python3 run.py``.
+  1. Run the Relying Party (RP): ``python run.py``.
   1. Verify the RP is running at [http://localhost:8090](http://localhost:8090).
   
 1. Start adding to the skeleton code:
