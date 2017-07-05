@@ -1,5 +1,4 @@
-This document describes how to setup the provided Python code
-(in the directory ``OIDCRPExample/``).
+This document describes how to setup the provided Python code.
 
 # Prerequisites
 
@@ -15,7 +14,7 @@ On Mac:
     
 On Ubuntu:
 
-    apt-get install libffi-dev libsasl2-dev libss-dev
+    apt-get install libffi-dev libsasl2-dev libssl-dev
         
 ## Project setup
 
